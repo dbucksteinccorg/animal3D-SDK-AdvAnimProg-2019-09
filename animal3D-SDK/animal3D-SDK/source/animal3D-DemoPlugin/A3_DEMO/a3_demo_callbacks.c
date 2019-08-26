@@ -70,12 +70,12 @@ inline void a3demoCB_keyCharPress_main(a3_DemoState *demoState, a3i32 asciiKey,
 	switch (asciiKey)
 	{
 		// sub-modes
-	case '<':
-		demoState->demoSubMode[demoState->demoMode] = (demoSubMode + demoSubModeCount - 1) % demoSubModeCount;
-		break;
-	case '>':
-		demoState->demoSubMode[demoState->demoMode] = (demoSubMode + 1) % demoSubModeCount;
-		break;
+//	case '<':
+//		demoState->demoSubMode[demoState->demoMode] = (demoSubMode + demoSubModeCount - 1) % demoSubModeCount;
+//		break;
+//	case '>':
+//		demoState->demoSubMode[demoState->demoMode] = (demoSubMode + 1) % demoSubModeCount;
+//		break;
 
 		// toggle active camera
 //	case 'v':
@@ -84,6 +84,24 @@ inline void a3demoCB_keyCharPress_main(a3_DemoState *demoState, a3i32 asciiKey,
 //	case 'c':
 //		demoState->activeCamera = (demoState->activeCamera - 1 + demoStateMaxCount_cameraObject) % demoStateMaxCount_cameraObject;
 //		break;
+
+		// toggle skybox
+	case 'b':
+		demoState->displaySkybox = !demoState->displaySkybox;
+		break;
+
+		// toggle hidden volumes
+	case 'h':
+		demoState->displayHiddenVolumes = !demoState->displayHiddenVolumes;
+		break;
+
+		// toggle forward shading mode
+	case 'j':
+		demoState->forwardShadingMode = (demoState->forwardShadingMode + demoState->forwardShadingModeCount - 1) % demoState->forwardShadingModeCount;
+		break;
+	case 'k':
+		demoState->forwardShadingMode = (demoState->forwardShadingMode + 1) % demoState->forwardShadingModeCount;
+		break;
 	}
 }
 
@@ -206,6 +224,12 @@ A3DYLIBSYMBOL a3_DemoState *a3demoCB_load(a3_DemoState *demoState, a3boolean hot
 		// shaders
 		a3demo_loadShaders(demoState);
 
+		// textures
+		a3demo_loadTextures(demoState);
+
+		// animation
+		a3demo_loadAnimation(demoState);
+
 		// scene objects
 		a3demo_initScene(demoState);
 	}
@@ -234,6 +258,9 @@ A3DYLIBSYMBOL a3_DemoState *a3demoCB_unload(a3_DemoState *demoState, a3boolean h
 		// free graphics objects
 		a3demo_unloadGeometry(demoState);
 		a3demo_unloadShaders(demoState);
+		a3demo_unloadTextures(demoState);
+		a3demo_unloadFramebuffers(demoState);
+		a3demo_unloadAnimation(demoState);
 
 		// validate unload
 		a3demo_validateUnload(demoState);
@@ -341,6 +368,8 @@ A3DYLIBSYMBOL void a3demoCB_windowResize(a3_DemoState *demoState, a3i32 newWindo
 
 	// framebuffers should be initialized or re-initialized here 
 	//	since they are likely dependent on the window size
+	a3demo_unloadFramebuffers(demoState);
+	a3demo_loadFramebuffers(demoState);
 
 	// use framebuffer deactivate utility to set viewport
 	a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -frameBorder, -frameBorder, demoState->frameWidth, demoState->frameHeight);
@@ -447,17 +476,28 @@ A3DYLIBSYMBOL void a3demoCB_keyCharPress(a3_DemoState *demoState, a3i32 asciiKey
 
 		// toggle grid
 	case 'g':
-		demoState->displayGrid = 1 - demoState->displayGrid;
+		demoState->displayGrid = !demoState->displayGrid;
 		break;
 
 		// toggle world axes
 	case 'x':
-		demoState->displayWorldAxes = 1 - demoState->displayWorldAxes;
+		demoState->displayWorldAxes = !demoState->displayWorldAxes;
 		break;
 
 		// toggle object axes
 	case 'z':
-		demoState->displayObjectAxes = 1 - demoState->displayObjectAxes;
+		demoState->displayObjectAxes = !demoState->displayObjectAxes;
+		break;
+
+		// toggle tangent bases on vertices or other
+	case 'B':
+		demoState->displayTangentBases = !demoState->displayTangentBases;
+		break;
+
+
+		// update animation
+	case 'm':
+		demoState->updateAnimation = !demoState->updateAnimation;
 		break;
 	}
 

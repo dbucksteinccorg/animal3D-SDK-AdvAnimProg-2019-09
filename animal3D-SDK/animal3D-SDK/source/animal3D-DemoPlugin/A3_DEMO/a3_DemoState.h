@@ -62,14 +62,28 @@ extern "C"
 	//	more than enough memory to hold extra objects
 	enum a3_DemoStateObjectMaxCounts
 	{
+		demoStateMaxCount_sceneObject = 8,
 		demoStateMaxCount_cameraObject = 1,
-		demoStateMaxCount_projector = 1,
+		demoStateMaxCount_lightObject = 4,
+		demoStateMaxCount_projector = 2,
 
 		demoStateMaxCount_timer = 1,
 		demoStateMaxCount_drawDataBuffer = 1,
-		demoStateMaxCount_vertexArray = 2,
-		demoStateMaxCount_drawable = 2,
-		demoStateMaxCount_shaderProgram = 4,
+		demoStateMaxCount_vertexArray = 8,
+		demoStateMaxCount_drawable = 16,
+		demoStateMaxCount_shaderProgram = 8,
+
+		demoStateMaxCount_texture = 8,
+		demoStateMaxCount_framebuffer = 1,
+
+		demoStateMaxCount_objectTransformBlock = 1,
+
+		demoStateMaxCount_pointLightVolumePerBlock = a3index_countMaxShort / sizeof(a3_DemoPointLight),
+		demoStateMaxCount_pointLightVolumeBlock = 1 + (demoStateMaxCount_lightObject - 1) / demoStateMaxCount_pointLightVolumePerBlock,
+
+		demoStateMaxCount_skeletalTransformBlock = 3,
+
+		demoStateMaxCount_uniformBuffer = demoStateMaxCount_objectTransformBlock + demoStateMaxCount_pointLightVolumeBlock + demoStateMaxCount_skeletalTransformBlock,
 	};
 
 	// additional counters for demo modes
@@ -77,7 +91,7 @@ extern "C"
 	{
 		demoStateMaxModes = 1,
 		demoStateMaxSubModes = 1,
-		demoStateMaxOutputModes = 1,
+		demoStateMaxOutputModes = 2,
 	};
 
 	// demo mode names
@@ -94,6 +108,20 @@ extern "C"
 	{
 		// general
 		demoStateRenderPass_scene,
+		demoStateRenderPass_display,
+	};
+
+	// pipeline modes
+	enum a3_DemoStatePipelineModeNames
+	{
+		demoStatePipelineMode_forward,
+	};
+
+	// forward pipeline modes
+	enum a3_DemoStateForwardPipelineModeNames
+	{
+		demoStateForwardPipelineMode_solid,
+		demoStateForwardPipelineMode_Lambert,
 	};
 
 
@@ -149,7 +177,12 @@ extern "C"
 		a3ui32 demoModeCount, demoSubModeCount[demoStateMaxModes], demoOutputCount[demoStateMaxModes][demoStateMaxSubModes];
 
 		// toggle grid in scene and axes superimposed, as well as other mods
-		a3boolean displayGrid, displayWorldAxes, displayObjectAxes;
+		a3boolean displayGrid, displayWorldAxes, displayObjectAxes, displayTangentBases;
+		a3boolean displaySkybox, displayHiddenVolumes;
+		a3boolean updateAnimation;
+
+		// lighting modes
+		a3ui32 forwardShadingMode, forwardShadingModeCount;
 
 		// grid properties
 		a3mat4 gridTransform;
@@ -157,6 +190,13 @@ extern "C"
 
 		// cameras
 		a3ui32 activeCamera;
+
+		// lights
+		a3_DemoPointLight forwardPointLight[demoStateMaxCount_lightObject];
+		a3ui32 forwardLightCount;
+
+		// texture atlas transforms
+		a3mat4 atlas_stone, atlas_earth, atlas_mars, atlas_checker;
 
 
 		//---------------------------------------------------------------------
@@ -167,10 +207,33 @@ extern "C"
 
 		// scene objects
 		union {
+			a3_DemoSceneObject sceneObject[demoStateMaxCount_sceneObject];
+			struct {
+				// static scene objects
+				a3_DemoSceneObject
+					skyboxObject[1];
+
+				// interactive scene objects
+				a3_DemoSceneObject
+					planeObject[1],
+					sphereObject[1],
+					cylinderObject[1],
+					torusObject[1],
+					teapotObject[1];
+			};
+		};
+		union {
 			a3_DemoSceneObject cameraObject[demoStateMaxCount_cameraObject];
 			struct {
 				a3_DemoSceneObject
 					mainCameraObject[1];
+			};
+		};
+		union {
+			a3_DemoSceneObject lightObject[demoStateMaxCount_lightObject];
+			struct {
+				a3_DemoSceneObject
+					mainLightObject[1];
 			};
 		};
 
@@ -181,6 +244,8 @@ extern "C"
 			struct {
 				a3_DemoProjector
 					mainCamera[1];						// scene viewing cameras
+				a3_DemoProjector
+					mainLight[1];						// scene light projectors
 			};
 		};
 
@@ -209,6 +274,12 @@ extern "C"
 			a3_VertexArrayDescriptor vertexArray[demoStateMaxCount_vertexArray];
 			struct {
 				a3_VertexArrayDescriptor
+					vao_tangentBasis_skin[1],				// VAO for vertex format with full tangent basis and skin weights
+					vao_position_texcoord_normal_skin[1],	// VAO for vertex format with position, UVs, normal and skin weights
+					vao_position_texcoord_skin[1],			// VAO for vertex format with position, UVs and skin weights
+					vao_tangentBasis[1],					// VAO for vertex format with full tangent basis
+					vao_position_texcoord_normal[1],		// VAO for vertex format with position, UVs and normal
+					vao_position_texcoord[1],				// VAO for vertex format with position and UVs
 					vao_position_color[1],					// VAO for vertex format with position and color
 					vao_position[1];						// VAO for vertex format with only position
 			};
@@ -220,8 +291,27 @@ extern "C"
 			struct {
 				// overlay objects
 				a3_VertexDrawable
+					draw_unitquad[1],							// unit quad (used for fsq)
+					draw_skybox[1],								// skybox cube mesh
 					draw_grid[1],								// wireframe ground plane to emphasize scaling
 					draw_axes[1];								// coordinate axes (e.g. at the center of the world)
+
+				// additional display objects (normally hidden)
+				a3_VertexDrawable
+					draw_bone[1],								// spike shape for skeletal bone
+					draw_joint[1],								// ball shape for skeletal joint
+					draw_pointlight[1];							// volume for point light (low-res sphere)
+				
+				// basic scene models
+				a3_VertexDrawable
+					draw_torus[1],								// procedural torus
+					draw_cylinder[1],							// procedural cylinder
+					draw_sphere[1],								// procedural sphere
+					draw_plane[1];								// procedural plane
+
+				// loaded scene models
+				a3_VertexDrawable
+					draw_teapot[1];								// can't not have a Utah teapot
 			};
 		};
 
@@ -236,6 +326,61 @@ extern "C"
 					prog_drawColorAttrib[1],					// draw color attribute
 					prog_drawColorUnif_instanced[1],			// draw uniform color with instancing
 					prog_drawColorUnif[1];						// draw uniform color
+
+				// basic shading programs
+				a3_DemoStateShaderProgram
+					prog_drawLambertMulti_instanced[1],			// draw Lambertian shading model with instancing
+					prog_drawLambertMulti[1],					// draw Lambertian shading model (multiple lights)
+					prog_drawTexture_instanced[1],				// draw texture with instancing
+					prog_drawTexture[1];						// draw texture
+			};
+		};
+
+
+		// textures
+		union {
+			a3_Texture texture[demoStateMaxCount_texture];
+			struct {
+				a3_Texture
+					tex_skybox_clouds[1],
+					tex_skybox_water[1],
+					tex_sprite_test[1],
+					tex_atlas_dm[1],
+					tex_stone_dm[1],
+					tex_earth_dm[1],
+					tex_mars_dm[1],
+					tex_checker[1];
+			};
+		};
+
+
+		// framebuffers
+		union {
+			a3_Framebuffer framebuffer[demoStateMaxCount_framebuffer];
+			struct {
+				a3_Framebuffer
+					fbo_scene[1];					// fbo with color and depth
+			};
+		};
+
+
+		// uniform buffers
+		union {
+			a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
+			struct {
+				// general uniform buffers
+				a3_UniformBuffer
+					ubo_objectTransform[demoStateMaxCount_objectTransformBlock];
+
+				// lighting uniform buffers
+				a3_UniformBuffer
+					ubo_pointLight[demoStateMaxCount_pointLightVolumeBlock];
+
+				// animation uniform buffers
+				a3_UniformBuffer
+					ubo_transformBindPoseToCurrentPose_joint[1],
+					ubo_transformLMVP_joint[1],
+					ubo_transformLMVP_bone[1];
 			};
 		};
 
@@ -260,11 +405,17 @@ extern "C"
 	// loading
 	void a3demo_loadGeometry(a3_DemoState *demoState);
 	void a3demo_loadShaders(a3_DemoState *demoState);
+	void a3demo_loadTextures(a3_DemoState *demoState);
+	void a3demo_loadFramebuffers(a3_DemoState *demoState);
+	void a3demo_loadAnimation(a3_DemoState *demoState);
 	void a3demo_refresh(a3_DemoState *demoState);
 
 	// unloading
 	void a3demo_unloadGeometry(a3_DemoState *demoState);
 	void a3demo_unloadShaders(a3_DemoState *demoState);
+	void a3demo_unloadTextures(a3_DemoState *demoState);
+	void a3demo_unloadFramebuffers(a3_DemoState *demoState);
+	void a3demo_unloadAnimation(a3_DemoState *demoState);
 	void a3demo_validateUnload(const a3_DemoState *demoState);
 
 	// other utils & setup
