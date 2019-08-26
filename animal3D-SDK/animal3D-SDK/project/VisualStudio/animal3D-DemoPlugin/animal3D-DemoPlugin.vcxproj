@@ -211,11 +211,17 @@
   <ItemGroup>
     <None Include="..\..\..\resource\glsl\4x\fs\basic-display\drawColorAttrib_fs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\fs\basic-display\drawColorUnif_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\basic-shading\drawLambertMulti_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\basic-shading\drawTexture_fs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\basic-display\passColor_transform_instanced_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\basic-display\passColor_transform_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\basic-display\passthru_transform_instanced_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\basic-display\passthru_transform_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\basic-display\passthru_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\basic-shading\passTexcoordNormal_transform_instanced_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\basic-shading\passTexcoordNormal_transform_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\basic-shading\passTexcoord_transform_instanced_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\basic-shading\passTexcoord_transform_vs4x.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
