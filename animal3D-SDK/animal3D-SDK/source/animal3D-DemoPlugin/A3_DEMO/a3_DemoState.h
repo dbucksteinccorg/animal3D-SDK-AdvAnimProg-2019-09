@@ -43,6 +43,9 @@
 #include "_utilities/a3_DemoSceneObject.h"
 #include "_utilities/a3_DemoShaderProgram.h"
 
+// animation
+#include "_animation/a3_KeyframeAnimationController.h"
+
 
 //-----------------------------------------------------------------------------
 
@@ -120,6 +123,7 @@ extern "C"
 	// forward pipeline modes
 	enum a3_DemoStateForwardPipelineModeNames
 	{
+		demoStateForwardPipelineMode_sprite,
 		demoStateForwardPipelineMode_solid,
 		demoStateForwardPipelineMode_Lambert,
 	};
@@ -197,6 +201,16 @@ extern "C"
 
 		// texture atlas transforms
 		a3mat4 atlas_stone, atlas_earth, atlas_mars, atlas_checker;
+
+
+		// dummy texture atlas for test sprite sheet
+		a3_TextureAtlas testSpriteSheetAtlas[1];
+		a3mat4* testSpriteSheetAtlasTransformList;
+
+		// keyframe controller and data for test sprite sheet
+		a3_KeyframePool testSpriteSheetKeyframePool[1];
+		a3_ClipPool testSpriteSheetClipPool[1];
+		a3_ClipController testSpriteSheetClipController[1];
 
 
 		//---------------------------------------------------------------------

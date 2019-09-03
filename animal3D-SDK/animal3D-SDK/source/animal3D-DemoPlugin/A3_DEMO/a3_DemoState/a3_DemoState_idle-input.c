@@ -103,6 +103,11 @@ void a3demo_input_main(a3_DemoState *demoState, a3f64 dt)
 				demoState->verticalAxis ? azimuth : a3real_zero,
 				demoState->verticalAxis ? a3real_zero : azimuth);
 		}
+
+
+		// ****TO-DO
+		// test sprite controller
+
 	}
 }
 

@@ -204,6 +204,11 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 	a3demo_applyScale_internal(demoState->cylinderObject, scaleMat.m);
 	a3demo_applyScale_internal(demoState->torusObject, scaleMat.m);
 	a3demo_applyScale_internal(demoState->teapotObject, scaleMat.m);
+
+
+	// test sprite controller
+	a3clipControllerUpdate(demoState->testSpriteSheetClipController,
+		(a3real)dt * (a3keyboardIsHeld(demoState->keyboard, a3key_space) ? a3real_sixth : a3real_one));
 }
 
 

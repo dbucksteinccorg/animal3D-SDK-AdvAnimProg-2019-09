@@ -35,6 +35,8 @@
 
 #include "a3_DemoShaderProgram.h"
 
+#include "../_animation/a3_KeyframeAnimationController.h"
+
 
 //-----------------------------------------------------------------------------
 
@@ -47,6 +49,8 @@ extern "C"
 	
 //-----------------------------------------------------------------------------
 
+// utility to display keyframe animation clip controller info
+a3i32 a3displayClipController(const a3_TextRenderer* text, const a3_ClipController* clipCtrl, const a3vec4 textColor, const a3f32 textAlign, const a3f32 textOffset, const a3f32 textDepth, const a3f32 textOffsetDelta);
 
 
 //-----------------------------------------------------------------------------

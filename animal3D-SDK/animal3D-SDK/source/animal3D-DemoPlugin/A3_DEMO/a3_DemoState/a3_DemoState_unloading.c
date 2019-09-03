@@ -33,6 +33,7 @@
 #include "../a3_DemoState.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 //-----------------------------------------------------------------------------
@@ -98,7 +99,15 @@ void a3demo_unloadFramebuffers(a3_DemoState *demoState)
 // utility to unload animation
 void a3demo_unloadAnimation(a3_DemoState *demoState)
 {
+	// release texture atlas
+	a3textureAtlasRelease(demoState->testSpriteSheetAtlas);
+	free(demoState->testSpriteSheetAtlasTransformList);
 
+	// release keyframes
+	a3keyframePoolRelease(demoState->testSpriteSheetKeyframePool);
+	
+	// release clips
+	a3clipPoolRelease(demoState->testSpriteSheetClipPool);
 }
 
 

@@ -38,6 +38,28 @@
 
 //-----------------------------------------------------------------------------
 
+// utility to display keyframe animation clip controller info
+a3i32 a3displayClipController(const a3_TextRenderer* text, const a3_ClipController* clipCtrl, const a3vec4 textColor, const a3f32 textAlign, const a3f32 textOffset, const a3f32 textDepth, const a3f32 textOffsetDelta)
+{
+	const a3byte playDirectionStr[][16] = {
+		"<<reverse (-1)", "stopped (0)", "forward>> (+1)",
+	};
+
+	a3f32 offset = textOffset;
+	a3textDraw(text, textAlign, offset += textOffsetDelta, textDepth, textColor.r, textColor.g, textColor.b, textColor.a,
+		"CLIP CONTROLLER: %s", clipCtrl->name);
+	a3textDraw(text, textAlign, offset += textOffsetDelta, textDepth, textColor.r, textColor.g, textColor.b, textColor.a,
+		"    Clip index: %u: %s", clipCtrl->clipIndex_pool, clipCtrl->clipPtr->name);
+//	a3textDraw(text, textAlign, offset += textOffsetDelta, textDepth, textColor.r, textColor.g, textColor.b, textColor.a,
+//		"        Keyframe index: %u", clipCtrl->keyframeIndex_clip);
+
+	// ****TO-DO
+	// implement text drawing to display additional info
+
+
+	// done
+	return 1;
+}
 
 
 //-----------------------------------------------------------------------------
