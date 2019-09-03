@@ -70,6 +70,15 @@
     <Filter Include="Resource Files\A3_DEMO\glsl\4x\vs\basic-shading">
       <UniqueIdentifier>{b4d2d609-2776-453a-a624-c22e9a5a0f47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\common\A3_DEMO\_animation">
+      <UniqueIdentifier>{779fff29-1d92-4f90-81aa-14360ec90d82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\A3_DEMO\_animation">
+      <UniqueIdentifier>{8d371ea0-3441-41fc-a742-471a2619a2df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\A3_DEMO\_animation\_inl">
+      <UniqueIdentifier>{8cbdf8f5-f8c2-4b66-b7d2-b2982dbbf87f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_src_win\main_dll.c">
@@ -102,6 +111,15 @@
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\a3_DemoState\a3_DemoState_unloading.c">
       <Filter>Source Files\common\A3_DEMO\a3_DemoState</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_Hierarchy.c">
+      <Filter>Source Files\common\A3_DEMO\_animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimation.c">
+      <Filter>Source Files\common\A3_DEMO\_animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimationController.c">
+      <Filter>Source Files\common\A3_DEMO\_animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\a3_dylib_config_export.h">
@@ -118,6 +136,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_utilities\a3_DemoShaderProgram.h">
       <Filter>Header Files\A3_DEMO\_utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_Hierarchy.h">
+      <Filter>Header Files\A3_DEMO\_animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimation.h">
+      <Filter>Header Files\A3_DEMO\_animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimationController.h">
+      <Filter>Header Files\A3_DEMO\_animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +186,15 @@
     </None>
     <None Include="..\..\..\resource\glsl\4x\vs\basic-shading\passTexcoordNormal_transform_vs4x.glsl">
       <Filter>Resource Files\A3_DEMO\glsl\4x\vs\basic-shading</Filter>
+    </None>
+    <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_Hierarchy.inl">
+      <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
+    </None>
+    <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_KeyframeAnimation.inl">
+      <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
+    </None>
+    <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_KeyframeAnimationController.inl">
+      <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
     </None>
   </ItemGroup>
 </Project>
