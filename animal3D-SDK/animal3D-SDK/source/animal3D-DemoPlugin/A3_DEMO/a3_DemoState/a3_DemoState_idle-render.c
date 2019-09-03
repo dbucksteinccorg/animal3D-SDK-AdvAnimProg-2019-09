@@ -32,6 +32,9 @@
 
 #include "../a3_DemoState.h"
 
+// render utilities
+#include "../_utilities/a3_DemoRenderUtils.h"
+
 
 // OpenGL
 #ifdef _WIN32
@@ -136,6 +139,7 @@ void a3demo_render_main_controls(const a3_DemoState *demoState,
 		"Forward lighting",
 	};
 	const a3byte *forwardShadingName[] = {
+		"Sprite texture",
 		"Solid colors",
 		"Lambert shading",
 	};
@@ -224,6 +228,10 @@ void a3demo_render_data(const a3_DemoState *demoState)
 		"fps_actual = %.4lf ", __a3recipF64(demoState->renderTimer->previousTick));
 	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"fps_target = %.4lf ", (a3f64)demoState->renderTimer->ticks / demoState->renderTimer->totalTime);
+
+	// display more info
+	textOffset = -0.25f;
+	a3displayClipController(demoState->text, demoState->testSpriteSheetClipController, col, textAlign, textOffset, textDepth, textOffsetDelta);
 }
 
 
@@ -306,6 +314,7 @@ void a3demo_render_main(const a3_DemoState *demoState,
 
 	// forward shading programs
 	const a3_DemoStateShaderProgram *forwardPipelineShadingProgram[] = {
+		demoState->prog_drawTexture,
 		demoState->prog_drawColorUnif,
 		demoState->prog_drawLambertMulti,
 	};
@@ -391,7 +400,8 @@ void a3demo_render_main(const a3_DemoState *demoState,
 				a3shaderUniformSendInt(a3unif_single, currentDemoProgram->uLightCt, 1, &demoState->forwardLightCount);
 				a3shaderUniformBufferActivate(demoState->ubo_pointLight, 2);
 
-				// ****TO-DO: activate texture atlas
+				// activate texture atlas
+				a3textureActivate(demoState->tex_atlas_dm, a3tex_unit00);
 
 
 				// individual object requirements: 
@@ -414,13 +424,26 @@ void a3demo_render_main(const a3_DemoState *demoState,
 					a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMV_nrm, 1, modelViewMat.mm);
 					a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, color[k]);
 
-					// activate textures
-					a3textureActivate(tex_dm[k], a3tex_unit00);
+					// test sprite animation if active
+					if (demoState->forwardShadingMode == demoStateForwardPipelineMode_sprite)
+					{
+						// activate sprite sheet texture
+						a3textureActivate(demoState->testSpriteSheetAtlas->texture, a3tex_unit00);
 
-					// ****TO-DO: replace above texture activation with 
-					//	sending atlas transform uniform for the current object
+						// ****TO-DO
+						// send atlas transform based on current sprite cell
 
+					}
+					else
+					{
+						// activate texture for individual object
+					//	a3textureActivate(tex_dm[k], a3tex_unit00);
 
+						// replace above texture activation with sending atlas transform uniform for the current object
+						a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1, atlasTransformPtr[k].mm);
+					}
+
+					
 					// draw
 					currentDrawable = drawable[k];
 					a3vertexDrawableActivateAndRender(currentDrawable);

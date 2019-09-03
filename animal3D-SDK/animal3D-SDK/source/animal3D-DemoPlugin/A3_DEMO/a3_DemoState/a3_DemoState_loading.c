@@ -77,6 +77,7 @@
 #include "../a3_DemoState.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 //-----------------------------------------------------------------------------
@@ -690,9 +691,12 @@ void a3demo_loadTextures(a3_DemoState *demoState)
 				texSkyClouds[1],
 				texSkyWater[1];
 
-			// sprites and atlases
+			// sprites
 			a3_DemoStateTexture
-				texSpriteTest[1],
+				texSpriteTest[1];
+
+			// atlases
+			a3_DemoStateTexture
 				texAtlasDM[1];
 
 			// objects
@@ -737,8 +741,14 @@ void a3demo_loadTextures(a3_DemoState *demoState)
 		a3textureActivate(tex, a3tex_unit00);
 		a3textureChangeFilterMode(a3tex_filterLinear);	// linear pixel blending
 	}
+	// sprites
+	for (i = 0; i < 1; ++i, ++tex)
+	{
+		a3textureActivate(tex, a3tex_unit00);
+		a3textureChangeFilterMode(a3tex_filterNearest);	// nearest pixel
+	}
 	// atlases
-	for (i = 0; i < 2; ++i, ++tex)
+	for (i = 0; i < 1; ++i, ++tex)
 	{
 		a3textureActivate(tex, a3tex_unit00);
 		a3textureChangeFilterMode(a3tex_filterLinear);
@@ -752,16 +762,16 @@ void a3demo_loadTextures(a3_DemoState *demoState)
 
 
 	// set up texture atlas transforms
-	// ****TO-DO: find the correct numbers for all textures stored in atlas 
+	// find the correct numbers for all textures stored in atlas 
 	//	(currently all zeros; hint: look at the actual atlas texture)
 	a3demo_setAtlasTransform_internal(demoState->atlas_stone.m, atlasSceneWidth, atlasSceneHeight,
-		0, 0, 0, 0, atlasSceneBorderPad, atlasSceneAdditionalPad);
+		1600, 0, 256, 256, atlasSceneBorderPad, atlasSceneAdditionalPad);
 	a3demo_setAtlasTransform_internal(demoState->atlas_earth.m, atlasSceneWidth, atlasSceneHeight,
-		0, 0, 0, 0, atlasSceneBorderPad, atlasSceneAdditionalPad);
+		0, 0, 1024, 512, atlasSceneBorderPad, atlasSceneAdditionalPad);
 	a3demo_setAtlasTransform_internal(demoState->atlas_mars.m, atlasSceneWidth, atlasSceneHeight,
-		0, 0, 0, 0, atlasSceneBorderPad, atlasSceneAdditionalPad);
+		0, 544, 1024, 512, atlasSceneBorderPad, atlasSceneAdditionalPad);
 	a3demo_setAtlasTransform_internal(demoState->atlas_checker.m, atlasSceneWidth, atlasSceneHeight,
-		0, 0, 0, 0, atlasSceneBorderPad, atlasSceneAdditionalPad);
+		1888, 0, 128, 128, atlasSceneBorderPad, atlasSceneAdditionalPad);
 
 
 	// done
@@ -821,7 +831,55 @@ void a3demo_loadFramebuffers(a3_DemoState *demoState)
 // utility to load animation
 void a3demo_loadAnimation(a3_DemoState *demoState)
 {
+	const a3real testSpriteSheetKeyframeDuration = a3real_quarter;
+	const a3ui32 testSpriteSheetColumns = 8, testSpriteSheetRows = 8;
 
+	// tmp clip names
+	const a3byte* clipNames[] = {
+		"row00: idle",
+		"row01: walk",
+		"row02: run",
+		"row03: dance",
+		"row04: attack",
+		"row05: dead",
+		"row06: panic",
+		"row07: powerup",
+	};
+	const a3ui32 clipCount = sizeof(clipNames) / sizeof(a3byte*);
+
+	// counter
+	a3ui32 i;
+
+	// allocate sprite animation utilities
+	// texture atlas divides the sprite sheet into cells, which 
+	//	are then used to calculate a set of transforms
+	a3textureAtlasSetTexture(demoState->testSpriteSheetAtlas, demoState->tex_sprite_test);
+	a3textureAtlasAllocateEvenCells(demoState->testSpriteSheetAtlas, testSpriteSheetColumns, testSpriteSheetRows);
+	demoState->testSpriteSheetAtlasTransformList = (a3mat4*)malloc(
+		demoState->testSpriteSheetAtlas->numCells * sizeof(a3mat4));
+	for (i = 0; i < demoState->testSpriteSheetAtlas->numCells; ++i)
+		a3demo_setAtlasTransform_internal(demoState->testSpriteSheetAtlasTransformList[i].m,
+			demoState->testSpriteSheetAtlas->texture->width, demoState->testSpriteSheetAtlas->texture->height,
+			demoState->testSpriteSheetAtlas->cells[i].pixelOffset[0], demoState->testSpriteSheetAtlas->cells[i].pixelOffset[1],
+			demoState->testSpriteSheetAtlas->cells[i].pixelSize[0], demoState->testSpriteSheetAtlas->cells[i].pixelSize[1], 0, 0);
+
+	// initialize keyframes such that each one corresponds to a 
+	//	frame in the sprite sheet
+	a3keyframePoolCreate(demoState->testSpriteSheetKeyframePool, demoState->testSpriteSheetAtlas->numCells);
+	for (i = 0; i < demoState->testSpriteSheetKeyframePool->count; ++i)
+		a3keyframeInit(demoState->testSpriteSheetKeyframePool->keyframe + i,
+			testSpriteSheetKeyframeDuration, i);
+
+	// initialize clips such that each one corresponds to a 
+	//	row in the sprite sheet
+	a3clipPoolCreate(demoState->testSpriteSheetClipPool, clipCount);
+	for (i = 0; i < demoState->testSpriteSheetClipPool->count; ++i)
+		a3clipInit(demoState->testSpriteSheetClipPool->clip + i, clipNames[i],
+			demoState->testSpriteSheetKeyframePool, i * testSpriteSheetColumns, i * testSpriteSheetColumns + testSpriteSheetColumns - 1);
+
+	// initialize clip controller to play first clip in pool on loop
+	a3clipControllerInit(demoState->testSpriteSheetClipController, "test sprite ctrl",
+		demoState->testSpriteSheetClipPool, 0, a3clip_playForward, a3clip_playReverse, a3clip_playForward);
 }
 
 

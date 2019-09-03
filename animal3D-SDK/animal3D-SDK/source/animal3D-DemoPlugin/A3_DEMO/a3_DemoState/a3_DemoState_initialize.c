@@ -147,8 +147,8 @@ void a3demo_initScene(a3_DemoState *demoState)
 
 
 	// shading mode
-	demoState->forwardShadingModeCount = 2;
-	demoState->forwardShadingMode = demoStateForwardPipelineMode_solid;
+	demoState->forwardShadingModeCount = 3;
+	demoState->forwardShadingMode = demoStateForwardPipelineMode_sprite;
 	demoState->forwardLightCount = demoStateMaxCount_lightObject;
 
 
