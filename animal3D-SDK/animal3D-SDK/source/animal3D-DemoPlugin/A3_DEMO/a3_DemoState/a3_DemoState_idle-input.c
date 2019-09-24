@@ -103,12 +103,22 @@ void a3demo_input_main(a3_DemoState *demoState, a3f64 dt)
 				demoState->verticalAxis ? azimuth : a3real_zero,
 				demoState->verticalAxis ? a3real_zero : azimuth);
 		}
-
-
-		// ****TO-DO
-		// test sprite controller
-
 	}
+}
+
+
+// additional controls
+void a3demo_input_manipClipController(a3_DemoState* demoState, a3_ClipController* clipCtrl, const a3_ClipPool* clipPool)
+{
+	// modify clip controller
+	if (a3keyboardIsPressed(demoState->keyboard, a3key_rightArrow))
+		a3clipControllerSetPlayDirection(clipCtrl, a3clip_playForward);
+	if (a3keyboardIsPressed(demoState->keyboard, a3key_leftArrow))
+		a3clipControllerSetPlayDirection(clipCtrl, a3clip_playReverse);
+	if (a3keyboardIsPressed(demoState->keyboard, a3key_downArrow))
+		a3clipControllerSetPlayDirection(clipCtrl, a3clip_stop);
+	if (a3keyboardIsPressed(demoState->keyboard, a3key_upArrow))
+		a3clipControllerSetClip(clipCtrl, clipPool, (clipCtrl->clipIndex_pool + 1) % clipPool->count);
 }
 
 
@@ -117,11 +127,28 @@ void a3demo_input_main(a3_DemoState *demoState, a3f64 dt)
 
 void a3demo_input(a3_DemoState *demoState, a3f64 dt)
 {
+	// main controls
+	switch (demoState->demoMode)
+	{
+		// main render pipeline
+		// skeletal
+	case demoStateMode_main:
+	case demoStateMode_skeletal:
+		a3demo_input_main(demoState, dt);
+		break;
+	}
+
+	// additional controls
 	switch (demoState->demoMode)
 	{
 		// main render pipeline
 	case demoStateMode_main:
-		a3demo_input_main(demoState, dt);
+		a3demo_input_manipClipController(demoState, demoState->testSpriteSheetClipController, demoState->testSpriteSheetClipPool);
+		break;
+
+		// skeletal
+	case demoStateMode_skeletal:
+		a3demo_input_manipClipController(demoState, demoState->testSkeletonClipController, demoState->testSkeletonClipPool);
 		break;
 	}
 }

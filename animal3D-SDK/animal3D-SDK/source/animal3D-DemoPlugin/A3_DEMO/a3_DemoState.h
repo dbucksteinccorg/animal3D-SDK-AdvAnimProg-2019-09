@@ -45,6 +45,7 @@
 
 // animation
 #include "_animation/a3_KeyframeAnimationController.h"
+#include "_animation/a3_Kinematics.h"
 
 
 //-----------------------------------------------------------------------------
@@ -92,7 +93,7 @@ extern "C"
 	// additional counters for demo modes
 	enum a3_DemoStateModeCounts
 	{
-		demoStateMaxModes = 1,
+		demoStateMaxModes = 2,
 		demoStateMaxSubModes = 1,
 		demoStateMaxOutputModes = 2,
 	};
@@ -101,6 +102,7 @@ extern "C"
 	enum a3_DemoStateModeNames
 	{
 		demoStateMode_main,
+		demoStateMode_skeletal,
 	};
 
 	
@@ -213,6 +215,24 @@ extern "C"
 		a3_ClipController testSpriteSheetClipController[1];
 
 
+		// skeletal animation data
+		a3_Hierarchy testSkeletonHierarchy[1];
+		a3_HierarchyState testSkeletonHierarchyState[1];
+		a3_HierarchyPoseGroup testSkeletonHierarchyPoseGroup[1];
+		a3_HierarchyPoseFlag testSkeletonHierarchyPoseFlag[1][128];
+
+		// keyframe controller and data for test skeleton
+		a3_KeyframePool testSkeletonKeyframePool[1];
+		a3_ClipPool testSkeletonClipPool[1];
+		a3_ClipController testSkeletonClipController[1];
+
+		// skeletal controls
+		a3ui32 editSkeletonIndex;
+		a3ui32 editJointIndex;
+		a3ui32 editPoseIndex;
+		a3boolean editingJoint;
+
+
 		//---------------------------------------------------------------------
 		// object arrays: organized as anonymous unions for two reasons: 
 		//	1. easy to manage entire sets of the same type of object using the 
@@ -234,6 +254,10 @@ extern "C"
 					cylinderObject[1],
 					torusObject[1],
 					teapotObject[1];
+
+				// skeletal objects
+				a3_DemoSceneObject
+					skeletonObject[1];
 			};
 		};
 		union {

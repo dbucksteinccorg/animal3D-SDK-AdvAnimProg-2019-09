@@ -116,8 +116,8 @@ void a3demo_initScene(a3_DemoState *demoState)
 
 
 	// demo modes
-	demoState->demoModeCount = 1;
-	demoState->demoMode = 0;
+	demoState->demoModeCount = 2;
+	demoState->demoMode = 1;
 
 	// demo mode descriptions
 	//	1)	forward
@@ -134,6 +134,10 @@ void a3demo_initScene(a3_DemoState *demoState)
 	// update specific cases
 	demoState->demoSubModeCount[0] = 1;
 	demoState->demoOutputCount[0][0] = 2;
+
+	// demo mode C: skeletal
+	demoState->demoSubModeCount[1] = 1;
+	demoState->demoOutputCount[1][0] = 2;
 
 
 	// initialize other objects and settings
@@ -222,6 +226,20 @@ void a3demo_initScene(a3_DemoState *demoState)
 		demoState->torusObject->position.z = +1.0f;
 		demoState->cylinderObject->position.y = +6.0f;
 		demoState->teapotObject->position.y = -6.0f;
+	}
+
+
+	// skeleton
+	if (demoState->verticalAxis)
+	{
+		demoState->skeletonObject->position.z = -4.0f;
+		demoState->skeletonObject->euler.x = -90.0f;
+		demoState->skeletonObject->euler.z = +180.0f;
+	}
+	else
+	{
+		demoState->skeletonObject->position.y = +4.0f;
+		demoState->skeletonObject->euler.z = +180.0f;
 	}
 }
 
