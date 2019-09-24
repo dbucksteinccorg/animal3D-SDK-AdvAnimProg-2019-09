@@ -120,6 +120,12 @@
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimationController.c">
       <Filter>Source Files\common\A3_DEMO\_animation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_HierarchyState.c">
+      <Filter>Source Files\common\A3_DEMO\_animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_Kinematics.c">
+      <Filter>Source Files\common\A3_DEMO\_animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\a3_dylib_config_export.h">
@@ -144,6 +150,12 @@
       <Filter>Header Files\A3_DEMO\_animation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_KeyframeAnimationController.h">
+      <Filter>Header Files\A3_DEMO\_animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_HierarchyState.h">
+      <Filter>Header Files\A3_DEMO\_animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_Kinematics.h">
       <Filter>Header Files\A3_DEMO\_animation</Filter>
     </ClInclude>
   </ItemGroup>
@@ -194,6 +206,12 @@
       <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
     </None>
     <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_KeyframeAnimationController.inl">
+      <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
+    </None>
+    <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_HierarchyState.inl">
+      <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
+    </None>
+    <None Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_inl\a3_Kinematics.inl">
       <Filter>Header Files\A3_DEMO\_animation\_inl</Filter>
     </None>
   </ItemGroup>
