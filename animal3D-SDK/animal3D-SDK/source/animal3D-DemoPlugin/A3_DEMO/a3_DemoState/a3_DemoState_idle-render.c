@@ -204,6 +204,110 @@ void a3demo_render_main_controls(const a3_DemoState *demoState,
 }
 
 
+// controls for skeletal
+void a3demo_render_skeletal_controls(const a3_DemoState* demoState)
+{
+	// display mode info
+	const a3byte* modeText = "Skeletal animation";
+
+	// text color
+	const a3vec4 col = { a3real_one, a3real_zero, a3real_one, a3real_one };
+
+	// amount to offset text as each line is rendered
+	a3f32 textAlign = -0.98f;
+	a3f32 textOffset = 1.00f;
+	a3f32 textDepth = -1.00f;
+	const a3f32 textOffsetDelta = -0.08f;
+
+	// modes
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Demo mode (%u / %u) (',' prev | next '.'): %s", demoState->demoMode + 1, demoState->demoModeCount, modeText);
+//	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+//		"    Sub-mode (%u / %u) ('<' | '>'): %s", demoSubMode + 1, demoSubModeCount, subModeText[demoSubMode]);
+//	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+//		"        Output (%u / %u) ('{' | '}'): %s", demoOutput + 1, demoOutputCount, outputText[demoSubMode][demoOutput]);
+
+	// toggles
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"GRID in scene (toggle 'g') %d | SKYBOX backdrop ('b') %d", demoState->displayGrid, demoState->displaySkybox);
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"WORLD AXES (toggle 'x') %d | OBJECT AXES ('z') %d | TANGENT BASES ('B') %d", demoState->displayWorldAxes, demoState->displayObjectAxes, demoState->displayTangentBases);
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"ANIMATION updates (toggle 'm') %d", demoState->updateAnimation);
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"EDIT JOINTS (toggle '0') %d", demoState->editingJoint);
+
+	// editing controls
+	if (demoState->editingJoint)
+	{
+		const a3_HierarchyNodePose* currentNodePose = demoState->testSkeletonHierarchyState[demoState->editSkeletonIndex].poseGroup->pose[demoState->editPoseIndex].nodePose + demoState->editJointIndex;
+		const a3_HierarchyPoseFlag currentPoseFlag = demoState->testSkeletonHierarchyPoseFlag[demoState->editSkeletonIndex][demoState->editJointIndex];
+
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"    Editing pose %d / %d ( '_' prev | next '+' )", demoState->editPoseIndex + 1, demoState->testSkeletonHierarchyPoseGroup[demoState->editSkeletonIndex].poseCount);
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"    Editing joint %d / %d ( '-' prev | next '=' )", demoState->editJointIndex + 1, demoState->testSkeletonHierarchy[demoState->editSkeletonIndex].numNodes);
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"        Joint name: '%s'", demoState->testSkeletonHierarchy[demoState->editSkeletonIndex].nodes[demoState->editJointIndex].name);
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"        Edit DOFs: ");
+		if (currentPoseFlag & a3poseFlag_rotate)
+		{
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            orientation_x ('1' | '!'): %f", currentNodePose->orientation.x);
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            orientation_y ('2' | '@'): %f", currentNodePose->orientation.y);
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            orientation_z ('3' | '#'): %f", currentNodePose->orientation.z);
+		}
+		if (currentPoseFlag & a3poseFlag_translate)
+		{
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            translation_x ('4' | '$'): %f", currentNodePose->translation.x);
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            translation_y ('5' | '%%'): %f", currentNodePose->translation.y);
+			a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+				"            translation_z ('6' | '^'): %f", currentNodePose->translation.z);
+		}
+	//	if (currentPoseFlag & a3poseFlag_scale)
+	//	{
+	//		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+	//			"            scale_x ('7' | '&'): %f", currentNodePose->translation.x);
+	//		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+	//			"            scale_y ('8' | '*'): %f", currentNodePose->translation.y);
+	//		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+	//			"            scale_z ('9' | '('): %f", currentNodePose->translation.z);
+	//	}
+	}
+
+
+	//  move down
+	textOffset = -0.5f;
+
+	// display controls
+	if (a3XboxControlIsConnected(demoState->xcontrol))
+	{
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"Xbox controller camera control: ");
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"    Left joystick = rotate | Right joystick, triggers = move");
+	}
+	else
+	{
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"Keyboard/mouse camera control: ");
+		a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"    Left click & drag = rotate | WASDEQ = move | wheel = zoom");
+	}
+
+	// global controls
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Toggle text display:        't' (toggle) | 'T' (alloc/dealloc) ");
+	a3textDraw(demoState->text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Reload all shader programs: 'P' ****CHECK CONSOLE FOR ERRORS!**** ");
+}
+
+
 // scene data (HUD)
 void a3demo_render_data(const a3_DemoState *demoState)
 {
@@ -231,7 +335,16 @@ void a3demo_render_data(const a3_DemoState *demoState)
 
 	// display more info
 	textOffset = -0.25f;
-	a3displayClipController(demoState->text, demoState->testSpriteSheetClipController, col, textAlign, textOffset, textDepth, textOffsetDelta);
+	switch (demoState->demoMode)
+	{
+	case demoStateMode_main:
+		a3displayClipController(demoState->text, demoState->testSpriteSheetClipController, col, textAlign, textOffset, textDepth, textOffsetDelta);
+		break;
+
+	case demoStateMode_skeletal:
+		a3displayClipController(demoState->text, demoState->testSkeletonClipController, col, textAlign, textOffset, textDepth, textOffsetDelta);
+		break;
+	}
 }
 
 
@@ -430,9 +543,10 @@ void a3demo_render_main(const a3_DemoState *demoState,
 						// activate sprite sheet texture
 						a3textureActivate(demoState->testSpriteSheetAtlas->texture, a3tex_unit00);
 
-						// ****TO-DO
+						// ****TO-DO: uncomment (if your keyframe stuff is all set up)
 						// send atlas transform based on current sprite cell
-
+					//	a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1,
+					//		demoState->testSpriteSheetAtlasTransformList[demoState->testSpriteSheetClipController->keyframePtr->value_x].mm);
 					}
 					else
 					{
@@ -622,6 +736,154 @@ void a3demo_render_main(const a3_DemoState *demoState,
 }
 
 
+// sub-routine for rendering the demo state (main render pipeline)
+void a3demo_render_skeletal(const a3_DemoState *demoState)
+{
+	// pointers
+	const a3_VertexDrawable *currentDrawable;
+	const a3_DemoStateShaderProgram *currentDemoProgram;
+	const a3_Framebuffer *writeFBO, *readFBO;
+
+	// RGB
+	const a3vec4 rgba4[] = {
+		{ 1.0f, 0.0f, 0.0f, 1.0f },	// red
+		{ 0.0f, 1.0f, 0.0f, 1.0f },	// green
+		{ 0.0f, 0.0f, 1.0f, 1.0f },	// blue
+		{ 0.0f, 1.0f, 1.0f, 1.0f },	// cyan
+		{ 1.0f, 0.0f, 1.0f, 1.0f },	// magenta
+		{ 1.0f, 1.0f, 0.0f, 1.0f },	// yellow
+		{ 1.0f, 0.5f, 0.0f, 1.0f },	// orange
+		{ 0.0f, 0.5f, 1.0f, 1.0f },	// sky blue
+		{ 0.5f, 0.5f, 0.5f, 1.0f },	// solid grey
+		{ 0.5f, 0.5f, 0.5f, 0.5f },	// translucent grey
+	};
+	const a3real
+		*const red = rgba4[0].v, *const green = rgba4[1].v, *const blue = rgba4[2].v,
+		*const cyan = rgba4[3].v, *const magenta = rgba4[4].v, *const yellow = rgba4[5].v,
+		*const orange = rgba4[6].v, *const skyblue = rgba4[7].v,
+		*const grey = rgba4[8].v, *const grey_t = rgba4[9].v;
+
+	// indices
+//	a3ui32 i, j, k;
+	a3ui32 k;
+
+	// final model matrix and full matrix stack
+	a3mat4 modelViewProjectionMat = a3mat4_identity;
+
+	// camera used for rendering
+	const a3_DemoProjector *camera = demoState->mainCamera;
+	const a3_DemoSceneObject *cameraObject = camera->sceneObject;
+
+	// current scene object being rendered, for convenience
+	const a3_DemoSceneObject *currentSceneObject, *endSceneObject;
+
+	// other objects
+	const a3_HierarchyState *currentHierarchyState;
+	const a3_Hierarchy *currentHierarchy;
+
+
+	// activate scene fbo
+	writeFBO = demoState->fbo_scene;
+	a3framebufferActivate(writeFBO);
+
+	// clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// draw grid aligned to world
+	if (demoState->displayGrid)
+	{
+		currentDemoProgram = demoState->prog_drawColorUnif;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		currentDrawable = demoState->draw_grid;
+		modelViewProjectionMat = camera->viewProjectionMat;
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, demoState->gridColor.v);
+		a3vertexDrawableActivateAndRender(currentDrawable);
+	}
+
+
+	// set up to draw skeleton
+	currentDemoProgram = demoState->prog_drawColorUnif_instanced;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	currentHierarchyState = demoState->testSkeletonHierarchyState + demoState->editSkeletonIndex;
+	currentHierarchy = currentHierarchyState->poseGroup->hierarchy;
+
+	// draw skeletal joints
+	a3shaderUniformBufferActivate(demoState->ubo_transformLMVP_joint, 0);
+	a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, orange);
+	currentDrawable = demoState->draw_joint;
+	a3vertexDrawableActivateAndRenderInstanced(currentDrawable, currentHierarchy->numNodes);
+
+	// draw bones
+	a3shaderUniformBufferActivate(demoState->ubo_transformLMVP_bone, 0);
+	a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, skyblue);
+	currentDrawable = demoState->draw_bone;
+	a3vertexDrawableActivateAndRenderInstanced(currentDrawable, currentHierarchy->numNodes);
+
+	// draw skeletal joint orientations
+	if (demoState->displayTangentBases)
+	{
+		currentDemoProgram = demoState->prog_drawColorAttrib_instanced;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		a3shaderUniformBufferActivate(demoState->ubo_transformLMVP_joint, 0);
+		currentDrawable = demoState->draw_axes;
+		a3vertexDrawableActivateAndRenderInstanced(currentDrawable, currentHierarchy->numNodes);
+	}
+
+
+	// display scene fbo
+	a3framebufferDeactivateSetViewport(a3fbo_depthDisable,
+		-demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
+	readFBO = demoState->fbo_scene;
+	a3framebufferBindColorTexture(readFBO, a3tex_unit00, 0);
+
+	// simply display texture
+	glDisable(GL_BLEND);
+	currentDrawable = demoState->draw_unitquad;
+	currentDemoProgram = demoState->prog_drawTexture;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, a3mat4_identity.mm);
+	a3vertexDrawableActivateAndRender(currentDrawable);
+
+
+	// superimpose axes
+	// draw coordinate axes in front of everything
+	currentDemoProgram = demoState->prog_drawColorAttrib;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	currentDrawable = demoState->draw_axes;
+	a3vertexDrawableActivate(currentDrawable);
+
+	// center of world from current viewer
+	// also draw other viewer/viewer-like object in scene
+	if (demoState->displayWorldAxes)
+	{
+		modelViewProjectionMat = camera->viewProjectionMat;
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3vertexDrawableRenderActive();
+	}
+
+	// individual objects
+	if (demoState->displayObjectAxes)
+	{
+		// scene objects
+		for (k = 0,
+			currentSceneObject = demoState->skeletonObject, endSceneObject = demoState->skeletonObject;
+			currentSceneObject <= endSceneObject;
+			++k, ++currentSceneObject)
+		{
+			a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
+			a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+			a3vertexDrawableRenderActive();
+		}
+
+		// other objects
+		a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, demoState->mainLight->sceneObject->modelMat.m);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3vertexDrawableRenderActive();
+	}
+}
+
+
 //-----------------------------------------------------------------------------
 // RENDER
 
@@ -640,6 +902,11 @@ void a3demo_render(const a3_DemoState *demoState)
 		// main render pipeline
 	case demoStateMode_main:
 		a3demo_render_main(demoState, demoSubMode, demoOutput, demoSubModeCount, demoOutputCount);
+		break;
+
+		// skeletal
+	case demoStateMode_skeletal:
+		a3demo_render_skeletal(demoState);
 		break;
 	}
 
@@ -666,6 +933,11 @@ void a3demo_render(const a3_DemoState *demoState)
 			case demoStateMode_main:
 				a3demo_render_main_controls(demoState, 
 					demoSubMode, demoOutput, demoSubModeCount, demoOutputCount);
+				break;
+
+				// skeletal
+			case demoStateMode_skeletal:
+				a3demo_render_skeletal_controls(demoState);
 				break;
 			}
 			break;

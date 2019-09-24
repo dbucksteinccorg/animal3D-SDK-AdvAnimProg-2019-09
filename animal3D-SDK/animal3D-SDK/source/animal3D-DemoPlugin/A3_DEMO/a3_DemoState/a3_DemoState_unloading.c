@@ -105,9 +105,16 @@ void a3demo_unloadAnimation(a3_DemoState *demoState)
 
 	// release keyframes
 	a3keyframePoolRelease(demoState->testSpriteSheetKeyframePool);
+	a3keyframePoolRelease(demoState->testSkeletonKeyframePool);
 	
 	// release clips
 	a3clipPoolRelease(demoState->testSpriteSheetClipPool);
+	a3clipPoolRelease(demoState->testSkeletonClipPool);
+
+	// release skeletal resources
+	a3hierarchyRelease(demoState->testSkeletonHierarchy);
+	a3hierarchyStateRelease(demoState->testSkeletonHierarchyState);
+	a3hierarchyPoseGroupRelease(demoState->testSkeletonHierarchyPoseGroup);
 }
 
 

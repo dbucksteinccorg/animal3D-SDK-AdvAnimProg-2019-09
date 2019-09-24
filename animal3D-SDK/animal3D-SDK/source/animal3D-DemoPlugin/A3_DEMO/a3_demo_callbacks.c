@@ -115,6 +115,150 @@ inline void a3demoCB_keyCharHold_main(a3_DemoState *demoState, a3i32 asciiKey)
 }
 
 
+inline void a3demoCB_keyCharHold_skeletal(a3_DemoState* demoState, a3i32 asciiKey)
+{
+	// individual DOF editing
+	if (demoState->editingJoint)
+	{
+		a3_HierarchyNodePose* currentNodePose = demoState->testSkeletonHierarchyState[demoState->editSkeletonIndex].poseGroup->pose[demoState->editPoseIndex].nodePose + demoState->editJointIndex;
+		const a3_HierarchyPoseFlag currentPoseFlag = demoState->testSkeletonHierarchyPoseFlag[demoState->editSkeletonIndex][demoState->editJointIndex];
+		const a3boolean doesRotate = currentPoseFlag & a3poseFlag_rotate;
+		const a3boolean doesTranslate = currentPoseFlag & a3poseFlag_translate;
+		const a3boolean doesScale = currentPoseFlag & a3poseFlag_scale;
+		const a3real rotateRate = a3real_half;
+		const a3real translateRate = a3real_quarter;
+		const a3real scaleRate = a3real_fifth;
+
+		switch (asciiKey)
+		{
+			// sub rotate x
+		case '1':
+			if (doesRotate)
+				currentNodePose->orientation.x = a3trigValid_sind(currentNodePose->orientation.x - rotateRate);
+			break;
+			// add rotate x
+		case '!':
+			if (doesRotate)
+				currentNodePose->orientation.x = a3trigValid_sind(currentNodePose->orientation.x + rotateRate);
+			break;
+			// sub rotate y
+		case '2':
+			if (doesRotate)
+				currentNodePose->orientation.y = a3trigValid_sind(currentNodePose->orientation.y - rotateRate);
+			break;
+			// add rotate y
+		case '@':
+			if (doesRotate)
+				currentNodePose->orientation.y = a3trigValid_sind(currentNodePose->orientation.y + rotateRate);
+			break;
+			// sub rotate z
+		case '3':
+			if (doesRotate)
+				currentNodePose->orientation.z = a3trigValid_sind(currentNodePose->orientation.z - rotateRate);
+			break;
+			// add rotate z
+		case '#':
+			if (doesRotate)
+				currentNodePose->orientation.z = a3trigValid_sind(currentNodePose->orientation.z + rotateRate);
+			break;
+
+			// sub translate x
+		case '4':
+			if (doesTranslate)
+				currentNodePose->translation.x -= translateRate;
+			break;
+			// add translate x
+		case '$':
+			if (doesTranslate)
+				currentNodePose->translation.x += translateRate;
+			break;
+			// sub translate y
+		case '5':
+			if (doesTranslate)
+				currentNodePose->translation.y -= translateRate;
+			break;
+			// add translate y
+		case '%':
+			if (doesTranslate)
+				currentNodePose->translation.y += translateRate;
+			break;
+			// sub translate z
+		case '6':
+			if (doesTranslate)
+				currentNodePose->translation.z -= translateRate;
+			break;
+			// add translate z
+		case '^':
+			if (doesTranslate)
+				currentNodePose->translation.z += translateRate;
+			break;
+
+	//		// sub scale x
+	//	case '7':
+	//		if (doesScale)
+	//			currentNodePose->scale.x -= scaleRate;
+	//		break;
+	//		// add scale x
+	//	case '&':
+	//		if (doesScale)
+	//			currentNodePose->scale.x += scaleRate;
+	//		break;
+	//		// sub scale y
+	//	case '8':
+	//		if (doesScale)
+	//			currentNodePose->scale.y -= scaleRate;
+	//		break;
+	//		// add scale y
+	//	case '*':
+	//		if (doesScale)
+	//			currentNodePose->scale.y += scaleRate;
+	//		break;
+	//		// sub scale z
+	//	case '9':
+	//		if (doesScale)
+	//			currentNodePose->scale.z -= scaleRate;
+	//		break;
+	//		// add scale z
+	//	case '(':
+	//		if (doesScale)
+	//			currentNodePose->scale.z += scaleRate;
+	//		break;
+		}
+	}
+}
+
+inline void a3demoCB_keyCharPress_skeletal(a3_DemoState* demoState, a3i32 asciiKey)
+{
+	switch (asciiKey)
+	{
+	case '0':
+		demoState->editingJoint = !demoState->editingJoint;
+		break;
+
+	case '=':
+		if (demoState->editingJoint)
+			demoState->editJointIndex = (demoState->editJointIndex + 1) % demoState->testSkeletonHierarchy[demoState->editSkeletonIndex].numNodes;
+		break;
+	case '-':
+		if (demoState->editingJoint)
+			demoState->editJointIndex = (demoState->editJointIndex + demoState->testSkeletonHierarchy[demoState->editSkeletonIndex].numNodes - 1) % demoState->testSkeletonHierarchy[demoState->editSkeletonIndex].numNodes;
+		break;
+
+	case '+':
+		if (demoState->editingJoint)
+			demoState->editPoseIndex = (demoState->editPoseIndex + 1) % demoState->testSkeletonHierarchyPoseGroup[demoState->editSkeletonIndex].poseCount;
+		break;
+	case '_':
+		if (demoState->editingJoint)
+			demoState->editPoseIndex = (demoState->editPoseIndex + demoState->testSkeletonHierarchyPoseGroup[demoState->editSkeletonIndex].poseCount - 1) % demoState->testSkeletonHierarchyPoseGroup[demoState->editSkeletonIndex].poseCount;
+		break;
+	}
+
+	// call editing control
+	a3demoCB_keyCharHold_skeletal(demoState, asciiKey);
+}
+
+
 //-----------------------------------------------------------------------------
 // callback prototypes
 // NOTE: do not move to header; they should be private to this file
@@ -506,11 +650,14 @@ A3DYLIBSYMBOL void a3demoCB_keyCharPress(a3_DemoState *demoState, a3i32 asciiKey
 	switch (demoState->demoMode)
 	{
 		// main render pipeline
-		// planets
-		// raytrace
 	case demoStateMode_main:
 		a3demoCB_keyCharPress_main(demoState, asciiKey,
 			demoSubMode, demoOutput, demoSubModeCount, demoOutputCount);
+		break;
+
+		// skeletal
+	case demoStateMode_skeletal:
+		a3demoCB_keyCharPress_skeletal(demoState, asciiKey);
 		break;
 	}
 }
@@ -526,10 +673,13 @@ A3DYLIBSYMBOL void a3demoCB_keyCharHold(a3_DemoState *demoState, a3i32 asciiKey)
 	switch (demoState->demoMode)
 	{
 		// main render pipeline
-		// planets
-		// raytrace
 	case demoStateMode_main:
 		a3demoCB_keyCharHold_main(demoState, asciiKey);
+		break;
+
+		// skeletal
+	case demoStateMode_skeletal:
+		a3demoCB_keyCharHold_skeletal(demoState, asciiKey);
 		break;
 	}
 }
@@ -573,6 +723,7 @@ A3DYLIBSYMBOL void a3demoCB_mouseWheel(a3_DemoState *demoState, a3i32 delta, a3i
 		// main render pipeline
 		// skeletal
 	case demoStateMode_main:
+	case demoStateMode_skeletal:
 		// can use this to change zoom
 		// zoom should be faster farther away
 		camera = demoState->projector + demoState->activeCamera;
